@@ -12,7 +12,7 @@ ui <- fluidPage(
         fileInput('uploaded_dataset', 'Upload file'),
         textOutput('uploaded_text')
       ),
-      helper(
+      helper( # TODO: help file content
         content = 'format',
         fade = TRUE,
         radioButtons(
@@ -55,19 +55,43 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   observe_helpers()
+  
+  # import data
+  dtf_path <- reactive({ input$uploaded_dataset$datapath })
+  dtf <- reactive({ if (!is.null(dtf_path())) read.csv(dtf_path()) })
+  
+  # name selectors ui
   output$variables_ui <- renderUI({
     if (input$format == "long") {
       div(
-        selectInput('dv', 'Dependent varaible', choices = 1:3),
-        selectInput('iv', 'Independent (grouping) variable', choices = 1:3)
+        selectizeInput(
+          'dv',
+          'Dependent varaible',
+          choices = c('Choose a variable' = '', names(dtf()))
+        ),
+        selectInput(
+          'iv',
+          'Independent (grouping) variable',
+          choices = c('Choose a variable' = '', names(dtf()))
+        )
       )
     } else {
       div(
-        selectInput('v1', 'Sample 1', choices = 1:3),
-        selectInput('v2', 'Sample 2', choices = 1:3)
+        selectInput(
+          'v1',
+          'Sample 1',
+          choices = c('Choose a variable' = '', names(dtf()))
+        ),
+        selectInput(
+          'v2',
+          'Sample 2',
+          choices = c('Choose a variable' = '', names(dtf()))
+        )
       )
     }
   })
+  
+  # test output
   output$test_output <- renderTable({
     data.frame(
       name  = c("Test statistic", "Degrees of freedom", "p-value"),
