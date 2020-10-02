@@ -1,0 +1,15 @@
+.mean {
+  color: #c03921;
+}
+
+p {
+  font-size: 1.25em;
+}
+
+.page-header h1 {
+  font-size: 3em;
+}
+
+#test_output {
+  margin: 50px 20%;
+}
