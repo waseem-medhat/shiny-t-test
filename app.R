@@ -58,7 +58,7 @@ ui <- fluidPage(
         )
       ),
       hr(),
-      h2(textOutput('test_type')),
+      h2('Test output'),
       tableOutput('test_output')
     )
   )
@@ -106,18 +106,26 @@ server <- function(input, output, session) {
   
   # action button ui
   output$start_ui <- renderUI({
-    if (all(dtf_exists(), input$dv != '', input$iv != '')) {
+    if (
+      all(dtf_exists(), input$dv != '', input$iv != '') |
+      all(dtf_exists(), input$v1 != '', input$v2 != '')
+    ) {
       actionButton(class = 'btn-primary', 'start', 'Start') 
     }
   })
   
   # extract data
-  iv <- reactive({ dtf()[, input$iv] })
-  dv <- reactive({ dtf()[, input$dv] })
-  g1 <- eventReactive(input$start, { unique(iv())[1] })
-  g2 <- eventReactive(input$start, { unique(iv())[2] })
-  s1 <- eventReactive(input$start, { dv()[iv() == g1()] })
-  s2 <- eventReactive(input$start, { dv()[iv() == g2()] })
+  is_long <- reactive({ input$format == 'long' })
+  iv <- reactive({ if (is_long()) dtf()[, input$iv] })
+  dv <- reactive({ if (is_long()) dtf()[, input$dv] })
+  g1 <- eventReactive(input$start, { if (is_long()) unique(iv())[1] })
+  g2 <- eventReactive(input$start, { if (is_long()) unique(iv())[2] })
+  s1 <- eventReactive(input$start, {
+    if (is_long()) dv()[iv() == g1()] else dtf()[, input$v1]
+  })
+  s2 <- eventReactive(input$start, {
+    if (is_long()) dv()[iv() == g2()] else dtf()[, input$v2]
+  })
   
   # dependent variable warning
   output$iv_binary_warning <- renderText({
@@ -185,9 +193,6 @@ server <- function(input, output, session) {
     })
     output$g2_hist <- renderPlot({
       g2_hist()
-    })
-    output$test_type <- renderText({
-      paste('Test: two-sample,', ifelse(input$paired, 'paired', 'independent'))
     })
     output$test_output <- renderTable(
       output_df(),
