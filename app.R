@@ -1,22 +1,29 @@
 library(shiny)
 library(shinyhelper)
+library(shinydashboard)
+library(shinyWidgets)
 library(ggplot2)
 
 theme_set(theme_light())
 
-ui <- fluidPage(
+source('dbSidebar.R')
+
+old_ui <- fluidPage(
   title = "Student t-tests",
   tags$link(rel = "stylesheet", type = "text/css", href="style.css"),
   div(class = "page-header text-center", h1("Student's t-tests")),
   sidebarLayout(
     sidebarPanel = sidebarPanel(
       h3('Control Panel'), hr(),
-      div(
-        fileInput(
-          'uploaded_dataset',
-          'Upload file',
-          buttonLabel = icon('file-upload')
-        )
+      fileInput(
+        'uploaded_dataset',
+        'Upload file',
+        buttonLabel = icon('file-upload')
+      ),
+      radioGroupButtons(
+        'file_type',
+        'Specify file type',
+        choices = list('CSV' = 'csv', 'SPSS' = 'spss')
       ),
       helper( # TODO: help file content
         content = 'format',
@@ -62,6 +69,12 @@ ui <- fluidPage(
       tableOutput('test_output')
     )
   )
+)
+
+ui <- dashboardPage(
+  header = dashboardHeader(title = "t-tester"),
+  sidebar = dbSidebar,
+  body = dashboardBody()
 )
 
 server <- function(input, output, session) {
