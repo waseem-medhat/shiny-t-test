@@ -16,7 +16,7 @@ ui <- fluidPage(
           'uploaded_dataset',
           'Upload file',
           buttonLabel = icon('file-upload')
-        ),
+        )
       ),
       helper( # TODO: help file content
         content = 'format',
@@ -28,13 +28,16 @@ ui <- fluidPage(
         )
       ),
       uiOutput('variables_ui'), hr(),
+      checkboxInput('paired', 'Paired'),
+      checkboxInput('var_equal', 'Assume equal variances'), hr(),
       numericInput(
         'n_bins',
         'Number of histogram bins',
         value = 10,
         min = 5,
         max = 30
-      )
+      ),
+      uiOutput('start_ui')
     ),
     mainPanel = mainPanel(
       h1('Descriptives'),
@@ -55,8 +58,7 @@ ui <- fluidPage(
         )
       ),
       hr(),
-      h1('t-test'),
-      h2('Two-sample, ', textOutput('test_type')),
+      h2(textOutput('test_type')),
       tableOutput('test_output')
     )
   )
@@ -68,7 +70,7 @@ server <- function(input, output, session) {
   # import data
   dtf_path <- reactive({ input$uploaded_dataset$datapath })
   dtf_exists <- reactive({ !is.null(dtf_path()) })
-  dtf <- reactive({ if (dtf_exists()) read.csv(dtf_path()) else iris })
+  dtf <- reactive({ if (dtf_exists()) read.csv(dtf_path()) })
   
   # name selectors ui
   output$variables_ui <- renderUI({
@@ -83,7 +85,8 @@ server <- function(input, output, session) {
           'iv',
           'Independent (grouping) variable',
           choices = c('Choose a variable' = '', names(dtf())), selected = 'Species'
-        ), actionButton('printer', 'printer')
+        ),
+        em(class = 'text-danger', textOutput('iv_binary_warning'))
       )
     } else {
       div(
@@ -101,28 +104,46 @@ server <- function(input, output, session) {
     }
   })
   
+  # action button ui
+  output$start_ui <- renderUI({
+    if (all(dtf_exists(), input$dv != '', input$iv != '')) {
+      actionButton(class = 'btn-primary', 'start', 'Start') 
+    }
+  })
+  
   # extract data
   iv <- reactive({ dtf()[, input$iv] })
   dv <- reactive({ dtf()[, input$dv] })
-  g1 <- reactive({ unique(iv())[1] })
-  g2 <- reactive({ unique(iv())[2] })
-  s1 <- reactive({ dv()[iv() == g1()] })
-  s2 <- reactive({ dv()[iv() == g2()] })
+  g1 <- eventReactive(input$start, { unique(iv())[1] })
+  g2 <- eventReactive(input$start, { unique(iv())[2] })
+  s1 <- eventReactive(input$start, { dv()[iv() == g1()] })
+  s2 <- eventReactive(input$start, { dv()[iv() == g2()] })
+  
+  # dependent variable warning
+  output$iv_binary_warning <- renderText({
+    if (!dtf_exists() | input$iv == '') {
+      ''
+    } else if (length(unique(iv())) != 2) {
+      'Warning: the independent variable is not binary.'
+    } else {
+      ''
+    }
+  })
   
   # descriptives
-  g1_mean <- reactive({ mean(s1()) })
-  g2_mean <- reactive({ mean(s2()) })
-  g1_sd <- reactive({ sd(s1()) })
-  g2_sd <- reactive({ sd(s2()) })
+  g1_mean <- eventReactive(input$start, { mean(s1()) })
+  g2_mean <- eventReactive(input$start, { mean(s2()) })
+  g1_sd <- eventReactive(input$start, { sd(s1()) })
+  g2_sd <- eventReactive(input$start, { sd(s2()) })
   
   # plots
-  g1_hist <- reactive({
+  g1_hist <- eventReactive(input$start, {
     ggplot(NULL, aes(s1())) +
       geom_histogram(bins = input$n_bins, fill = 'gray20') +
       geom_vline(xintercept = g1_mean(), color = 'steelblue', size = 2) +
       labs(x = '', y = '')
   })
-  g2_hist <- reactive({
+  g2_hist <- eventReactive(input$start, {
     ggplot(NULL, aes(s2())) +
       geom_histogram(bins = input$n_bins, fill = 'gray20') +
       geom_vline(xintercept = g2_mean(), color = 'steelblue', size = 2) +
@@ -130,38 +151,51 @@ server <- function(input, output, session) {
   })
   
   # test output
-  output_df <- reactive({
+  t_obj <- eventReactive(input$start, {
+    t.test(
+      x = s1(),
+      y = s2(),
+      paired = input$paired,
+      var.equal = input$var_equal
+    )
+  })
+  output_df <- eventReactive(input$start, {
     data.frame(
       name  = c("Test statistic", "Degrees of freedom", "p-value"),
-      value = rep(NA, 3)
+      value = c(t_obj()$statistic, t_obj()$parameter, t_obj()$p.value)
     )
   })
   
   # renders
-  output$g1_mean <- renderText({
-    paste( "Mean:", round(g1_mean(), 3) ) 
+  observeEvent(input$start, {
+    output$g1_mean <- renderText({
+      paste( "Mean:", round(g1_mean(), 3) ) 
+    })
+    output$g2_mean <- renderText({
+      paste( "Mean:", round(g2_mean(), 3) ) 
+    })
+    output$g1_sd <- renderText({
+      paste( "Std. deviation:", round(g1_sd(), 3) ) 
+    })
+    output$g2_sd <- renderText({
+      paste( "Std. deviation:", round(g2_sd(), 3) ) 
+    })
+    output$g1_hist <- renderPlot({
+      g1_hist()
+    })
+    output$g2_hist <- renderPlot({
+      g2_hist()
+    })
+    output$test_type <- renderText({
+      paste('Test: two-sample,', ifelse(input$paired, 'paired', 'independent'))
+    })
+    output$test_output <- renderTable(
+      output_df(),
+      colnames = FALSE,
+      width = "100%",
+      align = 'l'
+    )
   })
-  output$g2_mean <- renderText({
-    paste( "Mean:", round(g2_mean(), 3) ) 
-  })
-  output$g1_sd <- renderText({
-    paste( "Std. deviation:", round(g1_sd(), 3) ) 
-  })
-  output$g2_sd <- renderText({
-    paste( "Std. deviation:", round(g2_sd(), 3) ) 
-  })
-  output$g1_hist <- renderPlot({
-    g1_hist()
-  })
-  output$g2_hist <- renderPlot({
-    g2_hist()
-  })
-  output$test_output <- renderTable(
-    output_df(),
-    colnames = FALSE,
-    width = "100%",
-    align = 'l'
-  )
 }
 
 shinyApp(ui, server)
