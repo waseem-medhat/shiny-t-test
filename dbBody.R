@@ -48,10 +48,41 @@ dbBody <- dashboardBody(
           ),
           column(7, uiOutput('variables_ui'))
         )
+      ),
+      uiOutput('start_ui')
+    ),
+    tabItem(
+      'explore',
+      numericInput(
+        'n_bins',
+        'Number of histogram bins',
+        value = 10,
+        min = 5,
+        max = 30
+      ),
+      fluidRow(
+        column(
+          6,
+          h2('Group 1'),
+          textOutput('g1_mean'),
+          textOutput('g1_sd'),
+          plotOutput('g1_hist')
+        ),
+        column(
+          6,
+          h2('Group 2'),
+          textOutput('g2_mean'),
+          textOutput('g2_sd'),
+          plotOutput('g2_hist')
+        )
       )
     ),
     tabItem(
-      'explore'
+      'analyze',
+      checkboxInput('paired', 'Paired'),
+      checkboxInput('var_equal', 'Assume equal variances'),
+      h2('Test output'),
+      tableOutput('test_output')
     )
   )
 )

@@ -36,38 +36,37 @@ old_ui <- fluidPage(
       #   )
       # ),
       # uiOutput('variables_ui'),
-      checkboxInput('paired', 'Paired'),
-      checkboxInput('var_equal', 'Assume equal variances'), hr(),
-      numericInput(
-        'n_bins',
-        'Number of histogram bins',
-        value = 10,
-        min = 5,
-        max = 30
-      ),
-      uiOutput('start_ui')
+      # checkboxInput('paired', 'Paired'),
+      # checkboxInput('var_equal', 'Assume equal variances'), hr(),
+      # numericInput(
+      #   'n_bins',
+      #   'Number of histogram bins',
+      #   value = 10,
+      #   min = 5,
+      #   max = 30
+      # )
     ),
     mainPanel = mainPanel(
-      h1('Descriptives'),
-      fluidRow(
-        column(
-          6,
-          h2('Group 1'),
-          textOutput('g1_mean'),
-          textOutput('g1_sd'),
-          plotOutput('g1_hist')
-        ),
-        column(
-          6,
-          h2('Group 2'),
-          textOutput('g2_mean'),
-          textOutput('g2_sd'),
-          plotOutput('g2_hist')
-        )
-      ),
-      hr(),
-      h2('Test output'),
-      tableOutput('test_output')
+      # h1('Descriptives'),
+      # fluidRow(
+      #   column(
+      #     6,
+      #     h2('Group 1'),
+      #     textOutput('g1_mean'),
+      #     textOutput('g1_sd'),
+      #     plotOutput('g1_hist')
+      #   ),
+      #   column(
+      #     6,
+      #     h2('Group 2'),
+      #     textOutput('g2_mean'),
+      #     textOutput('g2_sd'),
+      #     plotOutput('g2_hist')
+      #   )
+      # ),
+      # hr(),
+      # h2('Test output'),
+      # tableOutput('test_output')
     )
   )
 )
@@ -121,7 +120,7 @@ server <- function(input, output, session) {
   
   # action button ui
   output$start_ui <- renderUI({
-    if (
+    if ( # TODO: fix logic
       all(dtf_exists(), input$dv != '', input$iv != '') |
       all(dtf_exists(), input$v1 != '', input$v2 != '')
     ) {
@@ -191,6 +190,7 @@ server <- function(input, output, session) {
   
   # renders
   observeEvent(input$start, {
+    print(input$dv)
     output$g1_mean <- renderText({
       paste( "Mean:", round(g1_mean(), 3) ) 
     })
