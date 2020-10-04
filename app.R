@@ -11,8 +11,8 @@ source('dbBody.R')
 
 old_ui <- fluidPage(
   title = "Student t-tests",
-  tags$link(rel = "stylesheet", type = "text/css", href="style.css"),
-  div(class = "page-header text-center", h1("Student's t-tests")),
+  # tags$link(rel = "stylesheet", type = "text/css", href="style.css"),
+  # div(class = "page-header text-center", h1("Student's t-tests")),
   sidebarLayout(
     sidebarPanel = sidebarPanel(
       # h3('Control Panel'), hr(),
@@ -75,7 +75,8 @@ old_ui <- fluidPage(
 ui <- dashboardPage(
   header = dashboardHeader(title = "t-tester"),
   sidebar = dbSidebar,
-  body = dbBody
+  body = dbBody,
+  skin = 'black'
 )
 
 server <- function(input, output, session) {
