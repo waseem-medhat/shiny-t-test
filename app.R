@@ -1,6 +1,7 @@
 library(shiny)
 library(shinyhelper)
 library(shinydashboard)
+library(dashboardthemes)
 library(shinyWidgets)
 library(ggplot2)
 
@@ -10,10 +11,13 @@ source('dbSidebar.R')
 source('dbBody.R')
 
 ui <- dashboardPage(
-  header = dashboardHeader(title = "t-tester"),
+  header = dashboardHeader(title = shinyDashboardLogo(
+    theme = 'grey_light',
+    boldText = 't-test',
+    badgeText = ' by Waseem'
+  )),
   sidebar = dbSidebar,
-  body = dbBody,
-  skin = 'black'
+  body = dbBody
 )
 
 server <- function(input, output, session) {

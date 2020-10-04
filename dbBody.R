@@ -2,8 +2,7 @@ prepTabItem <- function() {
   tabItem('prep',
           box(title = 'Import',
               width = 12,
-              status = 'info',
-              solidHeader = TRUE,
+              status = 'success',
               fluidRow(column(7,
                               fileInput('uploaded_dataset',
                                         'Upload file',
@@ -16,17 +15,17 @@ prepTabItem <- function() {
                                                 justified = TRUE)))),
           box(title = 'Select variables',
               width = 12,
-              status = 'info',
-              solidHeader = TRUE,
-              fluidRow(column(5,
+              status = 'success',
+              fluidRow(column(4,
                               helper(content = 'format',
                                      fade = TRUE,
+                                     colour = '#eee',
                                      radioButtons(
                                        'format',
                                        'Data format',
                                        choices = list('Long' = 'long',
                                                       'Wide' = 'wide')))),
-                       column(7, uiOutput('variables_ui')))),
+                       column(8, uiOutput('variables_ui')))),
           uiOutput('start_ui'))
 }
 
@@ -58,6 +57,7 @@ analyzeTabItem <- function () {
 }
 
 dbBody <- dashboardBody(
+  shinyDashboardThemes(theme = 'grey_dark'),
   tags$link(rel = "stylesheet", type = "text/css", href="style.css"),
   tabItems(
     prepTabItem(),
