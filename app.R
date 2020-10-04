@@ -5,10 +5,9 @@ library(dashboardthemes)
 library(shinyWidgets)
 library(ggplot2)
 
-theme_set(theme_light())
-
 source('dbSidebar.R')
 source('dbBody.R')
+source('ggDark.R')
 
 ui <- dashboardPage(
   header = dashboardHeader(title = shinyDashboardLogo(
@@ -35,12 +34,12 @@ server <- function(input, output, session) {
         selectizeInput(
           'dv',
           'Dependent varaible',
-          choices = c('Choose a variable' = '', names(dtf())), selected = 'Sepal.Length'
+          choices = c('Choose a variable' = '', names(dtf()))
         ),
         selectInput(
           'iv',
           'Independent (grouping) variable',
-          choices = c('Choose a variable' = '', names(dtf())), selected = 'Species'
+          choices = c('Choose a variable' = '', names(dtf()))
         ),
         em(class = 'text-danger', textOutput('iv_binary_warning'))
       )
@@ -62,11 +61,13 @@ server <- function(input, output, session) {
   
   # action button ui
   output$start_ui <- renderUI({
-    if ( # TODO: fix logic
+    if (
       all(dtf_exists(), input$dv != '', input$iv != '') |
       all(dtf_exists(), input$v1 != '', input$v2 != '')
     ) {
       actionButton(class = 'btn-primary', 'start', 'Start') 
+    } else {
+      em('Make sure you successfully uploaded data and chose your variables.')
     }
   })
   
@@ -103,15 +104,17 @@ server <- function(input, output, session) {
   # plots
   g1_hist <- eventReactive(input$start, {
     ggplot(NULL, aes(s1())) +
-      geom_histogram(bins = input$n_bins, fill = 'gray20') +
-      geom_vline(xintercept = g1_mean(), color = 'steelblue', size = 2) +
-      labs(x = '', y = '')
+      geom_histogram(bins = input$n_bins, fill = 'gray80', color = 'gray10') +
+      geom_vline(xintercept = g1_mean(), color = 'steelblue') +
+      labs(x = '', y = '') +
+      ggDarkTheme()
   })
   g2_hist <- eventReactive(input$start, {
     ggplot(NULL, aes(s2())) +
-      geom_histogram(bins = input$n_bins, fill = 'gray20') +
-      geom_vline(xintercept = g2_mean(), color = 'steelblue', size = 2) +
-      labs(x = '', y = '')
+      geom_histogram(bins = input$n_bins, fill = 'gray80', color = 'gray10') +
+      geom_vline(xintercept = g2_mean(), color = 'steelblue') +
+      labs(x = '', y = '') +
+      ggDarkTheme()
   })
   
   # test output
@@ -132,7 +135,6 @@ server <- function(input, output, session) {
   
   # renders
   observeEvent(input$start, {
-    print(input$dv)
     output$g1_mean <- renderText({
       paste( "Mean:", round(g1_mean(), 3) ) 
     })
@@ -145,10 +147,10 @@ server <- function(input, output, session) {
     output$g2_sd <- renderText({
       paste( "Std. deviation:", round(g2_sd(), 3) ) 
     })
-    output$g1_hist <- renderPlot({
+    output$g1_hist <- renderPlot(bg = 'transparent', {
       g1_hist()
     })
-    output$g2_hist <- renderPlot({
+    output$g2_hist <- renderPlot(bg = 'transparent', {
       g2_hist()
     })
     output$test_output <- renderTable(
