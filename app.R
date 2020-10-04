@@ -41,7 +41,7 @@ server <- function(input, output, session) {
           'Independent (grouping) variable',
           choices = c('Choose a variable' = '', names(dtf()))
         ),
-        em(class = 'text-danger', textOutput('iv_binary_warning'))
+        uiOutput('iv_binary_warning')
       )
     } else {
       div(
@@ -67,7 +67,8 @@ server <- function(input, output, session) {
     ) {
       actionButton(class = 'btn-primary', 'start', 'Start') 
     } else {
-      em('Make sure you successfully uploaded data and chose your variables.')
+      alert('Make sure you successfully uploaded data and chose your variables.',
+            status = 'danger')
     }
   })
   
@@ -85,13 +86,13 @@ server <- function(input, output, session) {
   })
   
   # dependent variable warning
-  output$iv_binary_warning <- renderText({
+  output$iv_binary_warning <- renderUI({
     if (!dtf_exists() | input$iv == '') {
-      ''
+      NULL
     } else if (length(unique(iv())) != 2) {
-      'Warning: the independent variable is not binary.'
+      alert('The independent variable is not binary.',status = 'danger')
     } else {
-      ''
+      NULL
     }
   })
   
