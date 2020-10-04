@@ -7,6 +7,7 @@ library(ggplot2)
 theme_set(theme_light())
 
 source('dbSidebar.R')
+source('dbBody.R')
 
 old_ui <- fluidPage(
   title = "Student t-tests",
@@ -14,27 +15,27 @@ old_ui <- fluidPage(
   div(class = "page-header text-center", h1("Student's t-tests")),
   sidebarLayout(
     sidebarPanel = sidebarPanel(
-      h3('Control Panel'), hr(),
-      fileInput(
-        'uploaded_dataset',
-        'Upload file',
-        buttonLabel = icon('file-upload')
-      ),
-      radioGroupButtons(
-        'file_type',
-        'Specify file type',
-        choices = list('CSV' = 'csv', 'SPSS' = 'spss')
-      ),
-      helper( # TODO: help file content
-        content = 'format',
-        fade = TRUE,
-        radioButtons(
-          'format',
-          'Data format',
-          choices = list('Long' = 'long', 'Wide' = 'wide')
-        )
-      ),
-      uiOutput('variables_ui'), hr(),
+      # h3('Control Panel'), hr(),
+      # fileInput(
+      #   'uploaded_dataset',
+      #   'Upload file',
+      #   buttonLabel = icon('file-upload')
+      # ),
+      # radioGroupButtons(
+      #   'file_type',
+      #   'Specify file type',
+      #   choices = list('CSV' = 'csv', 'SPSS' = 'spss')
+      # ),
+      # helper( # TODO: help file content
+      #   content = 'format',
+      #   fade = TRUE,
+      #   radioButtons(
+      #     'format',
+      #     'Data format',
+      #     choices = list('Long' = 'long', 'Wide' = 'wide')
+      #   )
+      # ),
+      # uiOutput('variables_ui'),
       checkboxInput('paired', 'Paired'),
       checkboxInput('var_equal', 'Assume equal variances'), hr(),
       numericInput(
@@ -74,7 +75,7 @@ old_ui <- fluidPage(
 ui <- dashboardPage(
   header = dashboardHeader(title = "t-tester"),
   sidebar = dbSidebar,
-  body = dashboardBody()
+  body = dbBody
 )
 
 server <- function(input, output, session) {
