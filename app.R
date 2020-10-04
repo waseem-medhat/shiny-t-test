@@ -65,7 +65,10 @@ server <- function(input, output, session) {
       all(dtf_exists(), input$dv != '', input$iv != '') |
       all(dtf_exists(), input$v1 != '', input$v2 != '')
     ) {
-      actionButton(class = 'btn-primary', 'start', 'Start') 
+      alert('Ready to explore!', status = 'success',
+            actionButton(class = 'btn-primary',
+                         style = 'margin: auto 15px;',
+                         'start', 'Start/Update'))
     } else {
       alert('Make sure you successfully uploaded data and chose your variables.',
             status = 'danger')

@@ -29,23 +29,26 @@ prepTabItem <- function() {
 exploreTabItem <- function() {
   tabItem('explore',
           boxDef(title = 'Tweak',
-                 numericInput('n_bins',
-                              'Number of histogram bins',
-                              value = 10,
-                              min = 5,
-                              max = 30),
-                 uiOutput('start_ui')
-          ),
+                 fluidRow(column(3,
+                                 numericInput('n_bins',
+                                              'Histogram bins',
+                                              value = 10,
+                                              min = 5,
+                                              max = 30)),
+                          column(3,
+                                 checkboxInput('normal_overlay',
+                                               'Show normal curve overlay')),
+                          column(6, uiOutput('start_ui')))),
           fluidRow(column(6,
-                          h2('Group 1'),
-                          textOutput('g1_mean'),
-                          textOutput('g1_sd'),
-                          plotOutput('g1_hist')),
+                          boxDef('Group 1',
+                                 textOutput('g1_mean'),
+                                 textOutput('g1_sd'),
+                                 plotOutput('g1_hist'))),
                    column(6,
-                          h2('Group 2'),
-                          textOutput('g2_mean'),
-                          textOutput('g2_sd'),
-                          plotOutput('g2_hist'))))
+                          boxDef('Group 2',
+                                 textOutput('g2_mean'),
+                                 textOutput('g2_sd'),
+                                 plotOutput('g2_hist')))))
 }
 
 analyzeTabItem <- function () {
@@ -58,7 +61,6 @@ analyzeTabItem <- function () {
 
 dbBody <- dashboardBody(
   shinyDashboardThemes(theme = 'grey_dark'),
-  tags$link(rel = "stylesheet", type = "text/css", href="style.css"),
   tabItems(
     prepTabItem(),
     exploreTabItem(),
