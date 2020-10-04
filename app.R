@@ -9,68 +9,6 @@ theme_set(theme_light())
 source('dbSidebar.R')
 source('dbBody.R')
 
-old_ui <- fluidPage(
-  title = "Student t-tests",
-  # tags$link(rel = "stylesheet", type = "text/css", href="style.css"),
-  # div(class = "page-header text-center", h1("Student's t-tests")),
-  sidebarLayout(
-    sidebarPanel = sidebarPanel(
-      # h3('Control Panel'), hr(),
-      # fileInput(
-      #   'uploaded_dataset',
-      #   'Upload file',
-      #   buttonLabel = icon('file-upload')
-      # ),
-      # radioGroupButtons(
-      #   'file_type',
-      #   'Specify file type',
-      #   choices = list('CSV' = 'csv', 'SPSS' = 'spss')
-      # ),
-      # helper( # TODO: help file content
-      #   content = 'format',
-      #   fade = TRUE,
-      #   radioButtons(
-      #     'format',
-      #     'Data format',
-      #     choices = list('Long' = 'long', 'Wide' = 'wide')
-      #   )
-      # ),
-      # uiOutput('variables_ui'),
-      # checkboxInput('paired', 'Paired'),
-      # checkboxInput('var_equal', 'Assume equal variances'), hr(),
-      # numericInput(
-      #   'n_bins',
-      #   'Number of histogram bins',
-      #   value = 10,
-      #   min = 5,
-      #   max = 30
-      # )
-    ),
-    mainPanel = mainPanel(
-      # h1('Descriptives'),
-      # fluidRow(
-      #   column(
-      #     6,
-      #     h2('Group 1'),
-      #     textOutput('g1_mean'),
-      #     textOutput('g1_sd'),
-      #     plotOutput('g1_hist')
-      #   ),
-      #   column(
-      #     6,
-      #     h2('Group 2'),
-      #     textOutput('g2_mean'),
-      #     textOutput('g2_sd'),
-      #     plotOutput('g2_hist')
-      #   )
-      # ),
-      # hr(),
-      # h2('Test output'),
-      # tableOutput('test_output')
-    )
-  )
-)
-
 ui <- dashboardPage(
   header = dashboardHeader(title = "t-tester"),
   sidebar = dbSidebar,
