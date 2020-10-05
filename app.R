@@ -49,12 +49,14 @@ server <- function(input, output, session) {
         selectInput(
           'v1',
           'Sample 1',
-          choices = c('Choose a variable' = '', names(dtf()))
+          choices = c('Choose a variable' = '', names(dtf())),
+          selected = ''
         ),
         selectInput(
           'v2',
           'Sample 2',
-          choices = c('Choose a variable' = '', names(dtf()))
+          choices = c('Choose a variable' = '', names(dtf())),
+          selected = ''
         )
       )
     }
@@ -63,8 +65,8 @@ server <- function(input, output, session) {
   # explore button ui
   output$start_ui <- renderUI({
     if (
-      all(dtf_exists(), input$dv != '', input$iv != '') |
-      all(dtf_exists(), input$v1 != '', input$v2 != '')
+      all(is_long(), input$dv != '', input$iv != '') |
+      all(!is_long(), input$v1 != '', input$v2 != '')
     ) {
       alert('Ready to explore!', status = 'success',
             actionButton(class = 'btn-primary',
@@ -108,18 +110,10 @@ server <- function(input, output, session) {
   
   # plots
   g1_hist <- eventReactive(input$start, {
-    ggplot(NULL, aes(s1())) +
-      geom_histogram(bins = input$n_bins, fill = 'gray80', color = 'gray10') +
-      geom_vline(xintercept = g1_mean(), color = 'steelblue') +
-      labs(x = '', y = '') +
-      ggDarkTheme()
+    ggDarkHist(s1(), g1_mean(), input$n_bins)
   })
   g2_hist <- eventReactive(input$start, {
-    ggplot(NULL, aes(s2())) +
-      geom_histogram(bins = input$n_bins, fill = 'gray80', color = 'gray10') +
-      geom_vline(xintercept = g2_mean(), color = 'steelblue') +
-      labs(x = '', y = '') +
-      ggDarkTheme()
+    ggDarkHist(s2(), g2_mean(), input$n_bins)
   })
   
   # test output
