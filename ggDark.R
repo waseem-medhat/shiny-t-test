@@ -6,11 +6,9 @@ ggDarkTheme <- function() {
           rect = element_rect(fill = 'transparent', color = NA))
 }
 
-ggDarkHist <- function(var, mean, n_bins) {
-  ggplot(NULL, aes(var)) +
-    geom_histogram(bins = n_bins, fill = 'gray80', color = 'gray10') +
-    geom_vline(xintercept = mean, color = 'steelblue',
-               size = 1, linetype = 2) +
+ggDarkHist <- function(var, n_bins) {
+  ggplot(NULL, aes(var, ..density..)) +
+    geom_histogram(bins = n_bins, fill = 'gray80', color = 'gray10', alpha = 0.5) +
     labs(x = '', y = '') +
     ggDarkTheme()
 }
