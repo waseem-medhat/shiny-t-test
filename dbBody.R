@@ -23,7 +23,8 @@ prepTabItem <- function() {
                                           'Data format',
                                           choices = list('Long' = 'long',
                                                          'Wide' = 'wide')))),
-                          column(8, uiOutput('variables_ui')))))
+                          column(8, uiOutput('variables_ui')))),
+          boxDef('Display', dataTableOutput('dtf')))
 }
 
 exploreTabItem <- function() {

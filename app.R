@@ -3,6 +3,7 @@ library(shinyhelper)
 library(shinydashboard)
 library(dashboardthemes)
 library(shinyWidgets)
+library(DT)
 library(ggplot2)
 
 source('dbSidebar.R')
@@ -59,7 +60,7 @@ server <- function(input, output, session) {
     }
   })
   
-  # action button ui
+  # explore button ui
   output$start_ui <- renderUI({
     if (
       all(dtf_exists(), input$dv != '', input$iv != '') |
@@ -138,6 +139,9 @@ server <- function(input, output, session) {
   })
   
   # renders
+  output$dtf <- renderDataTable(options = list(scrollX = TRUE), {
+    dtf()
+  })
   observeEvent(input$start, {
     output$g1_mean <- renderText({
       paste( "Mean:", round(g1_mean(), 3) ) 
