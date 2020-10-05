@@ -139,7 +139,10 @@ server <- function(input, output, session) {
   })
   
   # renders
-  output$dtf <- renderDataTable(options = list(scrollX = TRUE), {
+  output$dtf <- renderDataTable(options = list(scrollX = TRUE,
+                                               scrollY = 250,
+                                               scrollCollapse = TRUE,
+                                               paging = FALSE), {
     dtf()
   })
   observeEvent(input$start, {
