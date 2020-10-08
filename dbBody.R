@@ -41,7 +41,7 @@ exploreTabItem <- function() {
                                                'Show mean'),
                                  checkboxInput('density_overlay',
                                                'Show density curve')),
-                          column(6, uiOutput('start_ui')))),
+                          column(6, uiOutput('explore_ui')))),
           fluidRow(column(6,
                           boxDef('Group 1',
                                  textOutput('g1_mean'),
@@ -56,10 +56,13 @@ exploreTabItem <- function() {
 
 analyzeTabItem <- function () {
   tabItem('analyze',
-          checkboxInput('paired', 'Paired'),
-          checkboxInput('var_equal', 'Assume equal variances'),
-          h2('Test output'),
-          tableOutput('test_output'))
+          boxDef('Tweak',
+                 fluidRow(column(4,
+                                 checkboxInput('paired', 'Paired'),
+                                 checkboxInput('var_equal', 'Assume equal variances')),
+                          column(8, uiOutput('analyze_ui')))),
+          boxDef('Output',
+                 tableOutput('test_output')))
 }
 
 dbBody <- dashboardBody(

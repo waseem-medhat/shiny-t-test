@@ -70,7 +70,7 @@ server <- function(input, output, session) {
   })
   
   # explore button ui
-  output$start_ui <- renderUI({
+  output$explore_ui <- renderUI({
     if (
       all(is_long(), input$dv != '', input$iv != '') |
       all(!is_long(), input$v1 != '', input$v2 != '')
@@ -78,7 +78,23 @@ server <- function(input, output, session) {
       alert('Ready to explore!', status = 'success',
             actionButton(class = 'btn-primary',
                          style = 'margin: auto 15px;',
-                         'start', 'Start/Update'))
+                         'explore', 'Start/Update'))
+    } else {
+      alert('Make sure you successfully uploaded data and chose your variables.',
+            status = 'danger')
+    }
+  })
+  
+  # analyze button ui
+  output$analyze_ui <- renderUI({
+    if (
+      all(is_long(), input$dv != '', input$iv != '') |
+      all(!is_long(), input$v1 != '', input$v2 != '')
+    ) {
+      alert('Ready to analyze!', status = 'success',
+            actionButton(class = 'btn-primary',
+                         style = 'margin: auto 15px;',
+                         'analyze', 'Start/Update'))
     } else {
       alert('Make sure you successfully uploaded data and chose your variables.',
             status = 'danger')
@@ -89,12 +105,12 @@ server <- function(input, output, session) {
   is_long <- reactive({ input$format == 'long' })
   iv <- reactive({ if (is_long()) dtf()[, input$iv] })
   dv <- reactive({ if (is_long()) dtf()[, input$dv] })
-  g1 <- eventReactive(input$start, { if (is_long()) unique(iv())[1] })
-  g2 <- eventReactive(input$start, { if (is_long()) unique(iv())[2] })
-  s1 <- eventReactive(input$start, {
+  g1 <- reactive({ if (is_long()) unique(iv())[1] })
+  g2 <- reactive({ if (is_long()) unique(iv())[2] })
+  s1 <- reactive({
     if (is_long()) dv()[iv() == g1()] else dtf()[, input$v1]
   })
-  s2 <- eventReactive(input$start, {
+  s2 <- reactive({
     if (is_long()) dv()[iv() == g2()] else dtf()[, input$v2]
   })
   
@@ -110,25 +126,25 @@ server <- function(input, output, session) {
   })
   
   # descriptives
-  g1_mean <- eventReactive(input$start, { mean(s1()) })
-  g2_mean <- eventReactive(input$start, { mean(s2()) })
-  g1_sd <- eventReactive(input$start, { sd(s1()) })
-  g2_sd <- eventReactive(input$start, { sd(s2()) })
+  g1_mean <- reactive({ mean(s1()) })
+  g2_mean <- reactive({ mean(s2()) })
+  g1_sd <- reactive({ sd(s1()) })
+  g2_sd <- reactive({ sd(s2()) })
   
   # plots
-  g1_hist <- eventReactive(input$start, {
+  g1_hist <- eventReactive(input$explore, {
     ggDarkHist(s1(), input$n_bins) +
       { if (input$mean_overlay) ggDarkVline(g1_mean()) } +
       { if (input$density_overlay) ggDarkDensity() }
   })
-  g2_hist <- eventReactive(input$start, {
+  g2_hist <- eventReactive(input$explore, {
     ggDarkHist(s2(), input$n_bins) +
       { if (input$mean_overlay) ggDarkVline(g2_mean()) } +
       { if (input$density_overlay) ggDarkDensity() }
   })
   
   # test output
-  t_obj <- eventReactive(input$start, {
+  t_obj <- eventReactive(input$analyze, {
     t.test(
       x = s1(),
       y = s2(),
@@ -136,7 +152,7 @@ server <- function(input, output, session) {
       var.equal = input$var_equal
     )
   })
-  output_df <- eventReactive(input$start, {
+  output_df <- eventReactive(input$analyze, {
     data.frame(
       name  = c("Test statistic", "Degrees of freedom", "p-value"),
       value = c(t_obj()$statistic, t_obj()$parameter, t_obj()$p.value)
@@ -149,7 +165,7 @@ server <- function(input, output, session) {
                                                scrollY = 250,
                                                scrollCollapse = TRUE,
                                                paging = FALSE))
-  observeEvent(input$start, {
+  observeEvent(input$explore, {
     output$g1_mean <- renderText({
       paste( "Mean:", round(g1_mean(), 3) ) 
     })
@@ -168,6 +184,9 @@ server <- function(input, output, session) {
     output$g2_hist <- renderPlot(bg = 'transparent', {
       g2_hist()
     })
+  })
+  
+  observeEvent(input$analyze, {
     output$test_output <- renderTable(
       output_df(),
       colnames = FALSE,
