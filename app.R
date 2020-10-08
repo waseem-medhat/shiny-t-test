@@ -10,6 +10,7 @@ library(foreign)
 source('dbSidebar.R')
 source('dbBody.R')
 source('ggDark.R')
+source('variablesUI.R')
 
 ui <- dashboardPage(
   header = dashboardHeader(title = shinyDashboardLogo(
@@ -37,36 +38,7 @@ server <- function(input, output, session) {
   
   # name selectors ui
   output$variables_ui <- renderUI({
-    if (input$format == "long") {
-      div(
-        selectizeInput(
-          'dv',
-          'Dependent varaible',
-          choices = c('Choose a variable' = '', names(dtf()))
-        ),
-        selectInput(
-          'iv',
-          'Independent (grouping) variable',
-          choices = c('Choose a variable' = '', names(dtf()))
-        ),
-        uiOutput('iv_binary_warning')
-      )
-    } else {
-      div(
-        selectInput(
-          'v1',
-          'Sample 1',
-          choices = c('Choose a variable' = '', names(dtf())),
-          selected = ''
-        ),
-        selectInput(
-          'v2',
-          'Sample 2',
-          choices = c('Choose a variable' = '', names(dtf())),
-          selected = ''
-        )
-      )
-    }
+    if (input$format == "long") longVariablesUI(dtf()) else wideVariablesUI(dtf())
   })
   
   # explore button ui
