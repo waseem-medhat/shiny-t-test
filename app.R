@@ -111,21 +111,13 @@ server <- function(input, output, session) {
   # plots
   g1_hist <- eventReactive(input$start, {
     ggDarkHist(s1(), input$n_bins) +
-      { if (input$mean_overlay) geom_vline(xintercept = g1_mean(),
-                                           color = 'aquamarine2',
-                                           size = 1,
-                                           linetype = 2) } +
-      { if (input$density_overlay) geom_density(size = 1,
-                                                color = 'gold') }
+      { if (input$mean_overlay) ggDarkVline(g1_mean()) } +
+      { if (input$density_overlay) ggDarkDensity() }
   })
   g2_hist <- eventReactive(input$start, {
     ggDarkHist(s2(), input$n_bins) +
-      { if (input$mean_overlay) geom_vline(xintercept = g2_mean(),
-                                           color = 'aquamarine2',
-                                           size = 1,
-                                           linetype = 2) } +
-      { if (input$density_overlay) geom_density(size = 1,
-                                                color = 'gold') }
+      { if (input$mean_overlay) ggDarkVline(g2_mean()) } +
+      { if (input$density_overlay) ggDarkDensity() }
   })
   
   # test output

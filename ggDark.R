@@ -12,3 +12,11 @@ ggDarkHist <- function(var, n_bins) {
     labs(x = '', y = '') +
     ggDarkTheme()
 }
+
+ggDarkVline <- function(mean) {
+  geom_vline(xintercept = mean, color = 'aquamarine2', size = 1, linetype = 2)
+}
+
+ggDarkDensity <- function() {
+  geom_density(size = 1, color = 'gold')
+}
