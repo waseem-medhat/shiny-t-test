@@ -5,6 +5,7 @@ library(dashboardthemes)
 library(shinyWidgets)
 library(DT)
 library(ggplot2)
+library(foreign)
 
 source('dbSidebar.R')
 source('dbBody.R')
@@ -26,7 +27,13 @@ server <- function(input, output, session) {
   # import data
   dtf_path <- reactive({ input$uploaded_dataset$datapath })
   dtf_exists <- reactive({ !is.null(dtf_path()) })
-  dtf <- reactive({ if (dtf_exists()) read.csv(dtf_path()) })
+  dtf <- reactive({ if (dtf_exists()) {
+    if (input$file_type == 'csv') {
+      read.csv(dtf_path()) }
+    else if (input$file_type == 'spss') {
+      read.spss(dtf_path(), to.data.frame = TRUE)
+    }
+  }})
   
   # name selectors ui
   output$variables_ui <- renderUI({
@@ -137,12 +144,11 @@ server <- function(input, output, session) {
   })
   
   # renders
-  output$dtf <- renderDataTable(options = list(scrollX = TRUE,
+  output$dtf <- renderDataTable({ dtf() },
+                                options = list(scrollX = TRUE,
                                                scrollY = 250,
                                                scrollCollapse = TRUE,
-                                               paging = FALSE), {
-    dtf()
-  })
+                                               paging = FALSE))
   observeEvent(input$start, {
     output$g1_mean <- renderText({
       paste( "Mean:", round(g1_mean(), 3) ) 
