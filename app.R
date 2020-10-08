@@ -138,33 +138,19 @@ server <- function(input, output, session) {
                                                scrollCollapse = TRUE,
                                                paging = FALSE))
   observeEvent(input$explore, {
-    output$g1_mean <- renderText({
-      paste( "Mean:", round(g1_mean(), 3) ) 
-    })
-    output$g2_mean <- renderText({
-      paste( "Mean:", round(g2_mean(), 3) ) 
-    })
-    output$g1_sd <- renderText({
-      paste( "Std. deviation:", round(g1_sd(), 3) ) 
-    })
-    output$g2_sd <- renderText({
-      paste( "Std. deviation:", round(g2_sd(), 3) ) 
-    })
-    output$g1_hist <- renderPlot(bg = 'transparent', {
-      g1_hist()
-    })
-    output$g2_hist <- renderPlot(bg = 'transparent', {
-      g2_hist()
-    })
+    output$g1_mean <- renderText({ paste("Mean:", round(g1_mean(), 3)) })
+    output$g2_mean <- renderText({ paste("Mean:", round(g2_mean(), 3)) })
+    output$g1_sd <- renderText({ paste("Std. deviation:", round(g1_sd(), 3)) })
+    output$g2_sd <- renderText({ paste("Std. deviation:", round(g2_sd(), 3)) })
+    output$g1_hist <- renderPlot(bg = 'transparent', { g1_hist() })
+    output$g2_hist <- renderPlot(bg = 'transparent', { g2_hist() })
   })
   
   observeEvent(input$analyze, {
-    output$test_output <- renderTable(
-      output_df(),
-      colnames = FALSE,
-      width = "100%",
-      align = 'l'
-    )
+    output$test_output <- renderTable({ output_df() },
+                                      colnames = FALSE,
+                                      width = "100%",
+                                      align = 'l')
   })
 }
 
