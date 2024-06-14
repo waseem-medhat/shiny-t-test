@@ -13,9 +13,10 @@ source('ggDark.R')
 source('variablesUI.R')
 
 ui <- dashboardPage(
+  title = "Shiny t-Test",
   header = dashboardHeader(title = shinyDashboardLogo(
     theme = 'grey_light',
-    boldText = 't-test',
+    boldText = 'Shiny t-Test',
     badgeText = ' by Waseem'
   )),
   sidebar = dbSidebar,
